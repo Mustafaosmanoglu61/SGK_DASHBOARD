@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SGK AI Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body class="chat-page">
+  <header class="chat-topbar">
+    <div class="container chat-container">
+      <div class="chat-topbar-row">
+        <div class="chat-brand">
+          <div class="chat-logo">S</div>
+          <div>
+            <div class="chat-title">SGK Chat</div>
+            <div class="chat-sub">Özet veri + isteğe bağlı AI yanıtları</div>
+          </div>
+        </div>
+        <a class="btn ghost" href="/">Dashboard</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container chat-wrap chat-container">
+    <section class="chat-panel">
+      <div class="chat-meta">
+        <div class="chip-row" id="chipRow">
+          <button class="chip" data-q="Toplam kayıt sayısı nedir?">Toplam Kayıt</button>
+          <button class="chip" data-q="Başarı oranı kaç?">Başarı Oranı</button>
+          <button class="chip" data-q="En yoğun departman hangisi?">En Yoğun Departman</button>
+          <button class="chip" data-q="En yoğun pozisyon hangisi?">En Yoğun Pozisyon</button>
+          <button class="chip" data-q="Top 5 hata nedeni nedir?">Hata Nedenleri</button>
+          <button class="chip" data-q="Bu ayın özeti">Bu Ayın Özeti</button>
+        </div>
+        <div class="chat-status" id="chatStatus">Hazır</div>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg bot">Merhaba! data.json üzerinden özet ve metrik sorularını cevaplayabilirim.</div>
+      </div>
+
+      <form id="chatForm" class="chat-input-row">
+        <div class="chat-input-wrap">
+          <input id="chatInput" class="chat-input" placeholder="Soru yazın... (örn: Başarı oranı kaç?)" />
+          <button class="btn primary" type="submit">Gönder</button>
+        </div>
+      </form>
+      <div class="chat-hint">Not: OpenAI anahtarı yoksa yalnızca temel metrikler yanıtlanır.</div>
+    </section>
+  </main>
+
+  <script src="/src/chat.js"></script>
+</body>
+</html>

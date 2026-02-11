@@ -1,0 +1,7 @@
+2026-02 döneminde toplam 71 kayıt işlendi; 61 başarılı, 10 hatalı. Başarı oranı %85.9. En yoğun gün 2026-02-03 tarihinde 55 kayıt ile görüldü.
+
+Süre performansında ortalama işlem 23.9 saniye. Önceki ayla karşılaştırmada hacim -662 kayıt değişti. Başarı oranı -5.4 puan değişti. Ortalama süre -17.1 sn değişti.
+
+Son 6 ay içinde başarı oranı en düşük 2026-02 (%85.9), en yüksek 2025-11 (%94.5) seviyesinde gerçekleşti. Hastane (işyeri) yoğunluğu: VM-MP Kocaeli, ISÜ Tip Fakültesi, Liv Vadi, MP Göztepe, VM-MP Pendik. Öne çıkan departmanlar: Hasta Bakim Hizmetleri Müdürlügü, Misafir Hizmetleri Müdürlügü, Hekimlik. Öne çıkan pozisyonlar: Ayaktan Misafir Hizmetleri Yetkilisi, Genel YB Hemsiresi, Ayaktan Misafir Hizmetleri Danismani.
+
+En sık hata nedenleri: Kişinin çalışan kaydı daha önce yapılmış., Mailbox unavailable.. Süre ile hata durumu arasındaki ilişki zayıf (r=0.14).
