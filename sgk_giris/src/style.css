@@ -264,6 +264,25 @@ input#fDateRange{
   background: #2b3138;
   color: #f5f7fa;
 }
+.btn.ai-btn{
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 650;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  text-decoration: none;
+}
+.btn.ai-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(102,126,234,.4);
+}
+.btn.ai-btn:active{
+  transform: translateY(0);
+}
 .btn.ghost{
   border-color: #2a2f36;
   background: #1a1e24;

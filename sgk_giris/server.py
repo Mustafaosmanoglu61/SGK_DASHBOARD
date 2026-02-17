@@ -334,7 +334,29 @@ def index():
 
 @app.get("/chat")
 def chat():
-    return send_from_directory(BASE_DIR, "chat.html")
+    from flask import redirect
+    return redirect("/ai")
+
+
+# ── AI Interpreter sayfası ──
+AI_DIR = os.path.join(BASE_DIR, "..", "ai")
+CIKIS_SRC = os.path.join(BASE_DIR, "..", "sgk_cıkıs", "src")
+
+
+@app.get("/ai")
+@app.get("/ai/")
+def ai_page():
+    return send_from_directory(AI_DIR, "interpreter.html")
+
+
+@app.get("/ai/<path:filename>")
+def ai_static(filename):
+    return send_from_directory(AI_DIR, filename)
+
+
+@app.get("/src/datacikis.json")
+def serve_datacikis():
+    return send_from_directory(CIKIS_SRC, "datacikis.json")
 
 
 @app.post("/api/chat")
