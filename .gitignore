@@ -1,0 +1,22 @@
+# Ortam değişkenleri
+.env
+**/.env
+
+# Python sanal ortamlar
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# VS Code / Claude
+.vscode/
+.claude/
+
+# Gereksiz
+*.zip
+*.log

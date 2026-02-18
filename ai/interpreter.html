@@ -1,255 +1,392 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI SGK Rapor Analizi</title>
-    <link rel="stylesheet" href="../style.css">
-    <style>
-        .ai-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SGK AI Yorumlayıcı</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .ai-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            color: white;
-        }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f2f5;
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
 
-        .ai-header h1 {
-            margin: 0 0 10px 0;
-            font-size: 2.5em;
-        }
+    /* ── Sidebar ─────────────────────────────────────── */
+    .sidebar {
+      width: 236px;
+      min-width: 236px;
+      background: #fff;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 14px;
+      gap: 20px;
+      overflow-y: auto;
+    }
+    .sec-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 8px;
+    }
+    .api-wrap { position: relative; }
+    .api-input {
+      width: 100%;
+      padding: 8px 36px 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 13px;
+      background: #f9fafb;
+      outline: none;
+    }
+    .api-input:focus { border-color: #6366f1; background: #fff; }
+    .eye-btn {
+      position: absolute;
+      right: 8px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer; font-size: 16px; opacity: .5;
+    }
+    .eye-btn:hover { opacity: 1; }
+    .btn-save {
+      width: 100%;
+      margin-top: 8px;
+      padding: 8px;
+      background: #6366f1;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-save:hover { background: #4f46e5; }
+    .key-hint { font-size: 11px; color: #9ca3af; margin-top: 5px; }
 
-        .ai-header p {
-            margin: 0;
-            opacity: 0.9;
-        }
+    .radio-group { display: flex; flex-direction: column; gap: 7px; }
+    .radio-group label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 13px; cursor: pointer; color: #374151;
+    }
 
-        .interpreter-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+    .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .q-btn {
+      padding: 6px 4px;
+      font-size: 11.5px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #f9fafb;
+      cursor: pointer;
+      text-align: center;
+      color: #374151;
+      line-height: 1.3;
+      transition: background .12s;
+    }
+    .q-btn:hover { background: #ede9fe; border-color: #a5b4fc; }
 
-        .input-area {
-            margin-bottom: 20px;
-        }
+    /* ── Main ─────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
 
-        .input-area label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 20px;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      flex-shrink: 0;
+    }
+    .topbar-center h1  { font-size: 16px; font-weight: 700; text-align: center; }
+    .status-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; font-size: 12px; color: #6b7280; margin-top: 3px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .dot.green  { background: #22c55e; }
+    .dot.red    { background: #ef4444; }
+    .dot.yellow { background: #f59e0b; }
+    .nav-a { font-size: 12px; color: #6366f1; text-decoration: none; font-weight: 500; white-space: nowrap; }
+    .nav-a:hover { text-decoration: underline; }
 
-        .input-area textarea {
-            width: 100%;
-            min-height: 150px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: 'Courier New', monospace;
-            resize: vertical;
-            transition: border-color 0.3s;
-        }
+    .chat-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 20px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-        .input-area textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+    .msg { max-width: 80%; padding: 11px 15px; border-radius: 14px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .msg.system {
+      align-self: center; max-width: 92%; text-align: center;
+      background: #fef2f2; border: 1px solid #fecaca;
+      color: #7f1d1d; border-radius: 10px; font-size: 13px;
+    }
+    .msg.system.info { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
+    .msg.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #6366f1, #7c3aed);
+      color: #fff; border-bottom-right-radius: 4px;
+    }
+    .msg.assistant {
+      align-self: flex-start;
+      background: #fff; border: 1px solid #e5e7eb;
+      color: #111; border-bottom-left-radius: 4px;
+    }
+    .msg-label { font-size: 11px; font-weight: 700; margin-bottom: 4px; opacity: .6; }
 
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
+    .dots { display: inline-flex; gap: 4px; align-items: center; }
+    .dots span { width: 6px; height: 6px; border-radius: 50%; background: #6366f1; animation: blink 1.2s infinite; }
+    .dots span:nth-child(2) { animation-delay: .2s; }
+    .dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes blink { 0%,80%,100%{transform:scale(.6);opacity:.4} 40%{transform:scale(1);opacity:1} }
 
-        .ai-button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-
-        .ai-button.primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .ai-button.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .ai-button.secondary {
-            background: #f5f5f5;
-            color: #333;
-        }
-
-        .ai-button.secondary:hover {
-            background: #e0e0e0;
-        }
-
-        .output-area {
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-            min-height: 200px;
-            margin-top: 20px;
-        }
-
-        .output-area h3 {
-            margin-top: 0;
-            color: #667eea;
-        }
-
-        .result-item {
-            background: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            border-left: 4px solid #667eea;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .loading.active {
-            display: block;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 10px 20px;
-            background: #f5f5f5;
-            color: #333;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: background 0.3s;
-        }
-
-        .back-link:hover {
-            background: #e0e0e0;
-        }
-
-        .examples {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .example-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-
-        .example-card:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-
-        .example-card h4 {
-            margin: 0 0 8px 0;
-            color: #667eea;
-        }
-
-        .example-card p {
-            margin: 0;
-            font-size: 13px;
-            color: #666;
-        }
-    </style>
+    .input-bar {
+      padding: 12px 20px;
+      background: #fff;
+      border-top: 1px solid #e5e7eb;
+      display: flex; gap: 8px; align-items: center;
+      flex-shrink: 0;
+    }
+    .input-bar input {
+      flex: 1; padding: 10px 16px;
+      border: 1px solid #d1d5db; border-radius: 22px;
+      font-size: 14px; outline: none; background: #f9fafb;
+    }
+    .input-bar input:focus { border-color: #6366f1; background: #fff; }
+    .btn-send {
+      padding: 10px 22px;
+      background: linear-gradient(135deg, #6366f1, #7c3aed);
+      color: #fff; border: none; border-radius: 22px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: opacity .15s; white-space: nowrap;
+    }
+    .btn-send:disabled { opacity: .45; cursor: default; }
+    .btn-send:not(:disabled):hover { opacity: .88; }
+  </style>
 </head>
 <body>
-    <div class="ai-container">
-        <a href="../index.html" class="back-link">← Ana Sayfaya Dön</a>
-        
-        <div class="ai-header">
-            <h1>🤖 Yapay Zeka Yorumlayıcısı</h1>
-            <p>Verilerinizi yapay zeka ile analiz edin ve yorumlayın</p>
-        </div>
 
-        <div class="interpreter-section">
-            <h2>🔍 Analiz Seçenekleri</h2>
-            
-            <div class="input-area">
-                <label for="promptInput">Yapay Zekaya Sorunuz veya Analiz Talebi:</label>
-                <textarea id="promptInput" placeholder="Örnek: Departman bazında çalışan dağılımını analiz et"></textarea>
-            </div>
+<!-- SIDEBAR -->
+<aside class="sidebar">
 
-            <div class="button-group">
-                <button class="ai-button primary" onclick="analyzeData()">🚀 Analiz Et</button>
-                <button class="ai-button secondary" onclick="clearAll()">🗑️ Temizle</button>
-            </div>
-
-            <div class="examples">
-                <div class="example-card" onclick="loadExample(1)">
-                    <h4>📊 Genel İstatistikler</h4>
-                    <p>Toplam çalışan sayısı ve dağılım</p>
-                </div>
-                <div class="example-card" onclick="loadExample(2)">
-                    <h4>📈 Başarı Analizi</h4>
-                    <p>COMPLETED vs ERROR oranları</p>
-                </div>
-                <div class="example-card" onclick="loadExample(3)">
-                    <h4>🏢 Departman Analizi</h4>
-                    <p>Departman bazlı analiz</p>
-                </div>
-                <div class="example-card" onclick="loadExample(4)">
-                    <h4>🌍 Uyruk Dağılımı</h4>
-                    <p>Çalışanların uyruk analizi</p>
-                </div>
-            </div>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Yapay zeka analiz yapıyor...</p>
-            </div>
-
-            <div class="output-area" id="outputArea" style="display: none;">
-                <h3>📋 Analiz Sonucu</h3>
-                <div id="resultContent"></div>
-            </div>
-        </div>
+  <div>
+    <div class="sec-title">🔑 OpenAI API Key</div>
+    <div class="api-wrap">
+      <input type="password" id="apiInput" class="api-input" placeholder="sk-..." />
+      <button class="eye-btn" onclick="toggleEye()" title="Göster/Gizle">👁</button>
     </div>
+    <button class="btn-save" onclick="saveKey()">Kaydet</button>
+    <p class="key-hint">Key localStorage'da saklanır</p>
+  </div>
 
-    <script src="interpreter.js"></script>
+  <div>
+    <div class="sec-title">📊 Veri Kaynağı</div>
+    <div class="radio-group">
+      <label><input type="radio" name="src" value="combined" checked /> Her İkisi</label>
+      <label><input type="radio" name="src" value="giris" /> Giriş Verileri</label>
+      <label><input type="radio" name="src" value="cikis" /> Çıkış Verileri</label>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-title">⚡ Hızlı Sorular</div>
+    <div class="quick-grid">
+      <button class="q-btn" onclick="ask('Toplam kayıt sayısı nedir?')">Toplam Kayıt</button>
+      <button class="q-btn" onclick="ask('Başarı oranı nedir?')">Başarı Oranı</button>
+      <button class="q-btn" onclick="ask('En yoğun işyeri hangisi?')">İşyeri Analizi</button>
+      <button class="q-btn" onclick="ask('En çok karşılaşılan hata tipi nedir?')">Hata Analizi</button>
+      <button class="q-btn" onclick="ask('Çıkış nedenlerini analiz et')">Çıkış Nedenleri</button>
+      <button class="q-btn" onclick="ask('Giriş ve çıkış verilerini karşılaştır')">Karşılaştırma</button>
+      <button class="q-btn" onclick="ask('En yoğun departmanlar hangileri?')">Departmanlar</button>
+      <button class="q-btn" onclick="ask('En yoğun pozisyonlar hangileri?')">Pozisyonlar</button>
+      <button class="q-btn" onclick="ask('FTE tasarrufu ne kadar?')">FTE Tasarrufu</button>
+      <button class="q-btn" onclick="ask('Cinsiyet dağılımı nedir?')">Cinsiyet</button>
+    </div>
+  </div>
+
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <div class="topbar">
+    <a href="/sgk_giris/index.html" class="nav-a">← Giriş Dashboard</a>
+    <div class="topbar-center">
+      <h1>SGK AI Yorumlayıcı</h1>
+      <div class="status-row">
+        <span id="dataStatus">Veriler yükleniyor...</span>
+        &bull;
+        API: <span class="dot yellow" id="apiDot"></span>
+        <span id="apiStatus">Kontrol ediliyor</span>
+      </div>
+    </div>
+    <a href="/sgk_cikis/index.html" class="nav-a">Çıkış Dashboard →</a>
+  </div>
+
+  <div class="chat-body" id="chatBody">
+    <div class="msg system info" id="welcomeMsg">
+      <strong>SGK AI Yorumlayıcı</strong>'ya hoş geldiniz!<br/>
+      Hem <strong>İşe Giriş</strong> hem de <strong>İşten Çıkış</strong> verileri üzerinden soru sorabilirsiniz.<br/>
+      Veriler yükleniyor...
+    </div>
+  </div>
+
+  <div class="input-bar">
+    <input
+      id="qInput"
+      type="text"
+      placeholder="Sorunuzu yazın... (Enter ile gönderin)"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();send();}"
+    />
+    <button class="btn-send" id="sendBtn" onclick="send()">Gönder</button>
+  </div>
+
+</div>
+
+<script>
+// Flask server ile aynı origin (port 5500) – değiştirme gerekmez
+const API = '';
+
+// ── API Key ───────────────────────────────────
+function saveKey() {
+  const v = document.getElementById('apiInput').value.trim();
+  if (!v) return;
+  localStorage.setItem('sgk_oai_key', v);
+  setApiStatus(true);
+  addMsg('system info', 'API key kaydedildi ✓');
+}
+function getKey() { return localStorage.getItem('sgk_oai_key') || ''; }
+function setApiStatus(ok) {
+  document.getElementById('apiDot').className = 'dot ' + (ok ? 'green' : 'red');
+  document.getElementById('apiStatus').textContent = ok ? 'Bağlı' : 'Key Eksik';
+}
+function toggleEye() {
+  const i = document.getElementById('apiInput');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+// ── Veri yükleme ──────────────────────────────
+let loaded = { giris: false, cikis: false };
+
+async function loadData() {
+  try {
+    const [rG, rC] = await Promise.all([
+      fetch(API + '/api/data/giris'),
+      fetch(API + '/api/data/cikis'),
+    ]);
+    const parts = [];
+    if (rG.ok) { const d = await rG.json(); loaded.giris = true; parts.push('Giriş: ' + d.length + ' kayıt'); }
+    else addMsg('system', 'Giriş verisi yüklenemedi: ' + rG.status);
+    if (rC.ok) { const d = await rC.json(); loaded.cikis = true; parts.push('Çıkış: ' + d.length + ' kayıt'); }
+    else addMsg('system', 'Çıkış verisi yüklenemedi: ' + rC.status);
+
+    document.getElementById('dataStatus').textContent = parts.join(' · ') || 'Veri yüklenemedi';
+    const wm = document.getElementById('welcomeMsg');
+    if (wm && parts.length) {
+      wm.innerHTML =
+        '<strong>SGK AI Yorumlayıcı</strong>\'ya hoş geldiniz!<br/>' +
+        'Hem <strong>İşe Giriş</strong> hem de <strong>İşten Çıkış</strong> verileri üzerinden soru sorabilirsiniz.<br/>' +
+        parts.join(', ') + ' yüklendi ✓';
+    }
+  } catch (err) {
+    document.getElementById('dataStatus').textContent = 'Sunucuya bağlanılamadı';
+    addMsg('system',
+      'Flask server çalışmıyor!\n\nTerminalde (proje kökünden) şunu çalıştırın:\n' +
+      '  bash python_server/start.sh\n\nSonra bu sayfayı yenileyin (F5).'
+    );
+  }
+}
+
+// ── Chat ──────────────────────────────────────
+function addMsg(cls, text) {
+  const body = document.getElementById('chatBody');
+  const d = document.createElement('div');
+  d.className = 'msg ' + cls;
+  if (cls.includes('assistant')) {
+    const l = document.createElement('div');
+    l.className = 'msg-label';
+    l.textContent = 'AI Asistan';
+    d.appendChild(l);
+  }
+  const s = document.createElement('span');
+  s.textContent = text;
+  d.appendChild(s);
+  body.appendChild(d);
+  body.scrollTop = body.scrollHeight;
+  return d;
+}
+
+function addLoading() {
+  const body = document.getElementById('chatBody');
+  const d = document.createElement('div');
+  d.className = 'msg assistant';
+  d.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+  body.appendChild(d);
+  body.scrollTop = body.scrollHeight;
+  return d;
+}
+
+function getSrc() {
+  return (document.querySelector('input[name="src"]:checked') || {}).value || 'combined';
+}
+
+async function send() {
+  const input = document.getElementById('qInput');
+  const btn   = document.getElementById('sendBtn');
+  const q     = input.value.trim();
+  if (!q) return;
+  if (!loaded.giris && !loaded.cikis) {
+    addMsg('system', 'Veriler henüz yüklenmedi. Flask server çalışıyor mu?');
+    return;
+  }
+  input.value = '';
+  btn.disabled = true;
+  addMsg('user', q);
+  const ld = addLoading();
+
+  const ep = { combined: '/api/chat/combined', giris: '/api/chat', cikis: '/api/chat/cikis' }[getSrc()] || '/api/chat/combined';
+
+  try {
+    const res  = await fetch(API + ep, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: q, api_key: getKey() }),
+    });
+    const data = await res.json();
+    ld.remove();
+    addMsg('assistant', data.answer || 'Yanıt alınamadı.');
+    if (data.openai_error) addMsg('system', '⚠ OpenAI: ' + data.openai_error);
+  } catch (e) {
+    ld.remove();
+    addMsg('system', 'İstek hatası: ' + e.message);
+  }
+  btn.disabled = false;
+  input.focus();
+}
+
+function ask(t) { document.getElementById('qInput').value = t; send(); }
+
+// ── Init ──────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  const k = getKey();
+  if (k) { document.getElementById('apiInput').value = k; setApiStatus(true); }
+  else    { setApiStatus(false); }
+  loadData();
+});
+</script>
 </body>
 </html>
